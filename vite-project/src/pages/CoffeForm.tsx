@@ -17,8 +17,11 @@ import {
 } from 'react-icons/fa';
 import Input from '../components/Input';
 import Select from '../components/Select';
+import { useCoffeContext } from '../context/CoffeContext';
+import { useEffect, useMemo, useCallback, memo,  } from 'react';
 
-interface MyFormValues {
+export interface MyFormValues {
+    id: string;
     coffeName: string;
     roastLevel: 'light' | 'medium' | 'dark'
     in: string;
@@ -31,20 +34,20 @@ interface MyFormValues {
 }
 
 const formContainer = css`
-    background: rgba(255, 255, 255, 0.95);
+    background: var(--bg-card);
     backdrop-filter: blur(10px);
     border-radius: 20px;
     padding: 40px;
-    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 20px 40px var(--shadow);
     min-width: 500px;
     max-width: 600px;
     width: 100%;
-    border: 1px solid rgba(255, 255, 255, 0.2);
+    border: 1px solid var(--border-color);
     transition: all 0.3s ease;
     
     &:hover {
         transform: translateY(-2px);
-        box-shadow: 0 25px 50px rgba(0, 0, 0, 0.15);
+        box-shadow: 0 25px 50px var(--shadow-hover);
     }
     
     @media (max-width: 768px) {
@@ -67,7 +70,7 @@ const formContainer = css`
 const formTitle = css`
     font-size: 32px;
     font-weight: 700;
-    color: #2d3748;
+    color: var(--text-primary);
     text-align: center;
     margin-bottom: 8px;
     display: flex;
@@ -76,13 +79,13 @@ const formTitle = css`
     gap: 12px;
     
     svg {
-        color: #8b5cf6;
+        color: var(--accent);
     }
 `;
 
 const formSubtitle = css`
     font-size: 16px;
-    color: #6b7280;
+    color: var(--text-secondary);
     text-align: center;
     margin-bottom: 30px;
     font-weight: 400;
@@ -103,14 +106,14 @@ const formGrid = css`
     gap: 24px;
     margin-bottom: 32px;
     
-    & > div:first-child {
+    & > div:first-of-type {
         grid-column: 1 / -1;
     }
     
     @media (max-width: 768px) {
         grid-template-columns: 1fr;
         
-        & > div:first-child {
+        & > div:first-of-type {
             grid-column: auto;
         }
     }
@@ -118,7 +121,7 @@ const formGrid = css`
 
 const submitButton = css`
     width: 100%;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: var(--bg-primary);
     color: white;
     border: none;
     padding: 16px 24px;
@@ -135,7 +138,8 @@ const submitButton = css`
     
     &:hover {
         transform: translateY(-2px);
-        box-shadow: 0 10px 20px rgba(102, 126, 234, 0.4);
+        box-shadow: 0 10px 20px var(--shadow-hover);
+        opacity: 0.9;
     }
     
     &:active {
@@ -157,27 +161,45 @@ const roastOptions = [
     { value: 'dark', label: 'Ciemne palenie ⚫' }
 ];
 
-const CoffeForm = () => {
-    const initialValues: MyFormValues = {
-        coffeName: '',
-        roastLevel: 'light',
-        in: '',
-        out: '',
-        preInf: '',
-        totaltime: '',
-        firstDropStart: '',
-        dateOfRoast: '',
-        temperatura: '',
-    };
+// Wyciągam initialValues poza komponent - są stałe
+const initialValues: MyFormValues = {
+    id: '',
+    coffeName: '',
+    roastLevel: 'light',
+    in: '',
+    out: '',
+    preInf: '',
+    totaltime: '',
+    firstDropStart: '',
+    dateOfRoast: '',
+    temperatura: '',
+};
 
-    const handleSubmit = (
+const CoffeForm = memo(() => {
+    console.log('📦CoffeForm rendered')
+
+    const {addProfile, coffe} = useCoffeContext()
+
+    useEffect(() => {
+        console.log(coffe)
+    }, [coffe])
+
+    const temperatureOptions = useMemo(() => 
+        Array.from({length: 20}, (_, i) => i + 80), []
+    )
+
+    const roastLabels = useMemo(() => 
+        roastOptions.map(opt => opt.label), []
+    )
+
+    const handleSubmit = useCallback((
         values: MyFormValues,
-        { setSubmitting }: FormikHelpers<MyFormValues>
+        { setSubmitting, resetForm }: FormikHelpers<MyFormValues>
     ) => {
-        console.log('Form submitted with values:', values);
-        // wysyłanie danych w przyszlosci - uzyc redux
+        addProfile(values)
         setSubmitting(false);
-    };
+        resetForm();
+    }, [addProfile])
 
     return (
         <div css={formContainer}>
@@ -188,6 +210,8 @@ const CoffeForm = () => {
             <p css={formSubtitle}>
                 Zapisz swój idealny przepis na kawę
             </p>
+            
+     
             
             <Formik initialValues={initialValues} onSubmit={handleSubmit}>
                 <Form>
@@ -206,7 +230,7 @@ const CoffeForm = () => {
                             name="roastLevel" 
                             as={Select} 
                             label="Poziom palenia" 
-                            options={roastOptions.map(opt => opt.label)}
+                            options={roastLabels}
                             icon={<FaFire />}
                         />
                         <Field
@@ -262,7 +286,7 @@ const CoffeForm = () => {
                         as={Select}
                         label="Temperatura"
                         type="number"
-                        options={Array.from({length: 20}, (_, i) => i + 80)}
+                        options={temperatureOptions}
                         icon={<FaThermometerHalf />}
                         />
                     </div>
@@ -275,6 +299,8 @@ const CoffeForm = () => {
             </Formik>
         </div>
     );
-};
+});
+
+CoffeForm.displayName = 'CoffeForm'
 
 export default CoffeForm;

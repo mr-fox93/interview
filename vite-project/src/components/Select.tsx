@@ -1,4 +1,4 @@
-import { useId } from "react";
+import { useId, memo, useMemo } from "react";
 import { css } from "@emotion/react";
 import { FaChevronDown } from "react-icons/fa";
 
@@ -17,7 +17,7 @@ const labelStyle = css`
     display: block;
     font-size: 14px;
     font-weight: 600;
-    color: #374151;
+    color: var(--text-primary);
     margin-bottom: 8px;
     cursor: pointer;
     font-family: 'Inter', sans-serif;
@@ -77,9 +77,17 @@ const chevronStyle = css`
     pointer-events: none;
 `;
 
-const Select = ({id, label, options = [], icon, ...props}: SelectProps) => {
+const Select = memo(({id, label, options = [], icon, ...props}: SelectProps) => {
     const autoId = useId()
     const selectId = id || autoId
+
+    const optionElements = useMemo(() => 
+        options.map((option) => (
+            <option key={option} value={option}>
+                {option}
+            </option>
+        )), [options]
+    )
 
     return(
         <div css={selectContainer}>
@@ -91,16 +99,14 @@ const Select = ({id, label, options = [], icon, ...props}: SelectProps) => {
             <div css={selectWrapper}>
                 {icon && <div css={iconStyle}>{icon}</div>}
                 <select css={selectStyle} id={selectId} {...props}>
-                    {options.map((option) => (
-                        <option key={option} value={option}>
-                            {option}
-                        </option>
-                    ))}
+                    {optionElements}
                 </select>
                 <FaChevronDown css={chevronStyle} />
             </div>
         </div>
     )
-}
+})
+
+Select.displayName = 'Select'
 
 export default Select;
