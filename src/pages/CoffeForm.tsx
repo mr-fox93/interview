@@ -17,7 +17,8 @@ import {
 } from 'react-icons/fa';
 import Input from '../components/Input';
 import Select from '../components/Select';
-import { useCoffeContext } from '../context/CoffeContext';
+import { useAppDispatch, useAppSelector } from '../store/hooks';
+import { addProfile } from '../store/slices/coffeeSlice';
 import { useEffect, useMemo, useCallback, memo,  } from 'react';
 
 export interface MyFormValues {
@@ -178,11 +179,12 @@ const initialValues: MyFormValues = {
 const CoffeForm = memo(() => {
     console.log('📦CoffeForm rendered')
 
-    const {addProfile, coffe} = useCoffeContext()
+    const dispatch = useAppDispatch()
+    const coffee = useAppSelector((state) => state.coffee.profiles)
 
     useEffect(() => {
-        console.log(coffe)
-    }, [coffe])
+        console.log(coffee)
+    }, [coffee])
 
     const temperatureOptions = useMemo(() => 
         Array.from({length: 20}, (_, i) => i + 80), []
@@ -196,10 +198,10 @@ const CoffeForm = memo(() => {
         values: MyFormValues,
         { setSubmitting, resetForm }: FormikHelpers<MyFormValues>
     ) => {
-        addProfile(values)
+        dispatch(addProfile(values))
         setSubmitting(false);
         resetForm();
-    }, [addProfile])
+    }, [dispatch])
 
     return (
         <div css={formContainer}>

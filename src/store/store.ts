@@ -1,32 +1,14 @@
-/*
-
-import { configureStore } from "@reduxjs/toolkit";
-
-
+import { configureStore } from '@reduxjs/toolkit';
+import coffeeSlice from './slices/coffeeSlice';
+import themeSlice from './slices/themeSlice';
 
 export const store = configureStore({
-reducer:{
-    
-}
+  reducer: {
+    coffee: coffeeSlice,
+    theme: themeSlice,
+  },
+});
 
-})
+export type RootState = ReturnType<typeof store.getState>;
+export type AppDispatch = typeof store.dispatch;
 
-// action creatory i reducery - js funkcje w redux
-
-
-export const addNote = (payload) =>{
-    return{
-        type:'node/add', // lub ADD_TASK
-        payload, // TAKA SAMA NAZWA JAK TYPE
-    }
-}
-
- export const removeNote = (payload) =>{
-    return{
-        type:'node/remove',
-        payload
-    }
-}
-
-
-*/
