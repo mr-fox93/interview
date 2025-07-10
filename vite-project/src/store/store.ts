@@ -1,3 +1,5 @@
+/*
+
 import { configureStore } from "@reduxjs/toolkit";
 
 
@@ -25,3 +27,6 @@ export const addNote = (payload) =>{
         payload
     }
 }
+
+
+*/

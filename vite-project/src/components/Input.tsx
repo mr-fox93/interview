@@ -1,5 +1,5 @@
 import { css } from '@emotion/react'
-import { useId } from 'react'
+import { useId, memo } from 'react'
 
 interface InputProps extends React.InputHTMLAttributes<HTMLInputElement>{
     label?: string;
@@ -15,7 +15,7 @@ const labelStyle = css`
     display: block;
     font-size: 14px;
     font-weight: 600;
-    color: #374151;
+    color: var(--text-primary);
     margin-bottom: 8px;
     cursor: pointer;
     font-family: 'Inter', sans-serif;
@@ -66,7 +66,7 @@ const iconStyle = css`
     pointer-events: none;
 `;
 
-const Input = ({id, label, icon, ...props}: InputProps) => {
+const Input = memo(({id, label, icon, ...props}: InputProps) => {
     const autoId = useId()
     const inputId = id || autoId
 
@@ -87,6 +87,8 @@ const Input = ({id, label, icon, ...props}: InputProps) => {
             </div>
         </div>
     )
-}
+})
+
+Input.displayName = 'Input'
 
 export default Input;
